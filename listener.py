@@ -1,3 +1,10 @@
+######### NOTES FOR SETTING UP ################
+# Sender.js script needs to be running in one of model's bots/apps
+# FireFox
+# Python3
+# Pip3
+###############################################
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -130,7 +137,7 @@ def scrape_chatbox(data, scrapeMe, session):
                 Json['session'] = session
                 data.append(Json)
         except:
-            print("ERROR IN SCRAPE CHATBOX FUNC, MOST LIKELY '}' INSIDE MSG")
+            print("ERROR IN SCRAPE CHATBOX FUNC, MOST LIKELY '}' INSIDE A MSG")
 
 def ChaturBot(target_url, username, password, total_session, update_every, csv_file_path):
     driver = startup(target_url, username, password)
