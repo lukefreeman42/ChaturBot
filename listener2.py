@@ -102,12 +102,7 @@ def ChaturBot2 (target_url, username, password, update_every, csv_file_path):
                 except:
                     print(f'CSV NOT FOUND: CREATING NEW CSV {csv_file_path}!')
                     collection = []
-                try:
-                    if (driver.find_element_by_id('player_text_header').text == 'Offline'):
-                        print('END SESSION: MODEL OFFLINE')
-                        break
-                except:
-                    time.sleep(5)
+                time.sleep(5)
                 try:
                     scrapeMe = driver.find_element_by_class_name('chat-box').text
                     scrape_chatbox(collection, scrapeMe, session)
@@ -118,7 +113,7 @@ def ChaturBot2 (target_url, username, password, update_every, csv_file_path):
                     pd.DataFrame(collection).to_csv(csv_file_path)
                     time.sleep(update_every)
                 except:
-                    print('END SESSION: NO CHATBOX')
+                    print('SESSION HAS ENDED')
                     break
         except:
             print('UNABLE TO LOCATE CHAT-BOX')
