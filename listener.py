@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 import pandas as pd
 import time
 import re
@@ -37,7 +38,9 @@ print(f'UPDATE EVERY: {update_every} SECONDS')
 def startup(target_url, username, password):
     try:
         ### Go to target url
-        driver = webdriver.Firefox()
+        options = Options()
+        options.headless = True
+        driver = webdriver.Firefox(options = options)
         driver.get(target_url)
         print(f'FOUND {target_url}')
         ## Wait 10 seconds before timeouts
@@ -92,6 +95,7 @@ def scrape_start(driver, total_session, update_every, csv_file_path):
             collection = list(pd.read_csv(csv_file_path).drop('Unnamed: 0', axis=1).to_dict(orient='index').values())
             if start == 0:
                 print(f'LOADED {csv_file_path}')
+            print(f'LATEST ENTRY: {collection[-1]['date']}')
         except:
             print(f'CSV NOT FOUND: CREATING NEW CSV {csv_file_path}!')
             collection = []
