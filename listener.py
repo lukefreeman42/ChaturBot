@@ -3,6 +3,7 @@
 # FireFox
 # Python3
 # Pip3
+# nohup python3 listener.py CLIENT
 ###############################################
 
 from selenium import webdriver
