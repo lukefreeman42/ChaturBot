@@ -95,7 +95,7 @@ def scrape_start(driver, total_session, update_every, csv_file_path):
             collection = list(pd.read_csv(csv_file_path).drop('Unnamed: 0', axis=1).to_dict(orient='index').values())
             if start == 0:
                 print(f'LOADED {csv_file_path}')
-            print(f'LATEST ENTRY: {collection[-1]['date']}')
+            print(f"LATEST ENTRY: {collection[-1]['date']}")
         except:
             print(f'CSV NOT FOUND: CREATING NEW CSV {csv_file_path}!')
             collection = []
