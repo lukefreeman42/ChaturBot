@@ -116,7 +116,7 @@ def ChaturBot2 (target_url, username, password, update_every, csv_file_path):
                     print(f'SESSION HAS ENDED {datetime.datetime.now()}')
                     break
         except:
-            print('UNABLE TO LOCATE CHAT-BOX')
+            print(f'UNABLE TO LOCATE CHAT-BOX {datetime.datetime.now()}')
             time.sleep(15)
 
 ChaturBot2(target_url, username, password, update_every, csv_file_path)
