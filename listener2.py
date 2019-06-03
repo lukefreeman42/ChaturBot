@@ -31,7 +31,7 @@ def startup(target_url, username, password):
     try:
         ### Use Headless browser
         options = Options()
-        options.headless = True
+        #options.headless = True
         driver = webdriver.Firefox(options = options)
         ### Go to target url
         driver.get(target_url)
@@ -91,7 +91,7 @@ def ChaturBot2 (target_url, username, password, update_every, csv_file_path):
             print('LOCATED CHAT-BOX')
             time.sleep(5)
             session = datetime.datetime.now()
-            print('CREATING SESSION')
+            print(f'CREATING SESSION {session}')
             x = True
             while (True):
                 try:
@@ -113,7 +113,7 @@ def ChaturBot2 (target_url, username, password, update_every, csv_file_path):
                     pd.DataFrame(collection).to_csv(csv_file_path)
                     time.sleep(update_every)
                 except:
-                    print('SESSION HAS ENDED')
+                    print(f'SESSION HAS ENDED {datetime.datetime.now()}')
                     break
         except:
             print('UNABLE TO LOCATE CHAT-BOX')
