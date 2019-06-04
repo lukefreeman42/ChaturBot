@@ -93,6 +93,9 @@ def ChaturBot2 (target_url, username, password, update_every, csv_file_path):
     driver = startup(target_url, username, password)
     while (True):
         try : #attempts to find chat-box
+            time.sleep(20)
+            driver.get(target_url)
+            time.sleep(20)
             driver.find_element_by_class_name('chat-box')
             print('LOCATED CHAT-BOX')
             time.sleep(5)
@@ -123,6 +126,5 @@ def ChaturBot2 (target_url, username, password, update_every, csv_file_path):
                     break
         except:
             print(f'UNABLE TO LOCATE CHAT-BOX {datetime.datetime.now()}')
-            time.sleep(15)
 
 ChaturBot2(target_url, username, password, update_every, csv_file_path)
