@@ -120,7 +120,9 @@ def ChaturBot2 (target_url, username, password, update_every, csv_file_path):
                     except:
                         print('CSV UPDATED: NO LAST ENTRY')
                     pd.DataFrame(collection).to_csv(csv_file_path)
+                    driver.get(target_url)
                     time.sleep(update_every)
+                    driver.find_element_by_class_name('chat-box')
                 except:
                     print(f'SESSION HAS ENDED {datetime.datetime.now()}')
                     break
