@@ -38,7 +38,7 @@ def startup(target_url, username, password):
     try:
         ### Use Headless browser
         options = Options()
-        options.headless = False
+        options.headless = True
         driver = webdriver.Firefox(options = options)
         ### Go to target url
         driver.get(target_url)
