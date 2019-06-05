@@ -28,6 +28,7 @@ password = config.get(client, 'password')
 target_url = config.get(client, 'target_url')
 csv_file_path = config.get(client, 'csv_file_path')
 
+time_to_check = int(config.get('SETTINGS', 'time_to_check'))
 update_every = int(config.get('SETTINGS', 'update_every'))
 print(f'UPDATE EVERY: {update_every} SECONDS')
 
@@ -37,13 +38,13 @@ def startup(target_url, username, password):
     try:
         ### Use Headless browser
         options = Options()
-        options.headless = True
+        options.headless = False
         driver = webdriver.Firefox(options = options)
         ### Go to target url
         driver.get(target_url)
         print(f'FOUND {target_url}')
-        ## Wait 10 seconds before timeouts
-        wait = WebDriverWait(driver, 10) 
+        ## Wait 60 seconds before timeouts
+        wait = WebDriverWait(driver, 60) 
         ## Click I accept over 18
         accept_18 = wait.until(EC.element_to_be_clickable((By.ID, 'close_entrance_terms')))
         accept_18.click()
@@ -62,6 +63,7 @@ def startup(target_url, username, password):
         login_input.submit()
         print('SUBMITTED LOGIN CREDENTIALS')
         ## Return the enviornment
+        time.sleep(20)
         return (driver)
     except:
         print('STARTUP FAILED')
@@ -89,11 +91,10 @@ def scrape_chatbox(data, scrapeMe, session):
         except:
             print("ERROR IN SCRAPE CHATBOX FUNC, MOST LIKELY '}' INSIDE A MSG")
 
-def ChaturBot2 (target_url, username, password, update_every, csv_file_path):
+def ChaturBot2 (target_url, username, password, update_every, time_to_check, csv_file_path):
     driver = startup(target_url, username, password)
     while (True):
         try : #attempts to find chat-box
-            time.sleep(20)
             driver.get(target_url)
             time.sleep(20)
             driver.find_element_by_class_name('chat-box')
@@ -101,13 +102,12 @@ def ChaturBot2 (target_url, username, password, update_every, csv_file_path):
             time.sleep(5)
             session = datetime.datetime.now()
             print(f'CREATING SESSION {session}')
-            x = True
-            while (True):
+            x = 0
+            while (x < time_to_check):
                 try:
                     collection = list(pd.read_csv(csv_file_path).drop('Unnamed: 0', axis=1).to_dict(orient='index').values())
-                    if (x):
+                    if (x == 0):
                         print(f'LOADED {csv_file_path}')
-                        x = False
                 except:
                     print(f'CSV NOT FOUND: CREATING NEW CSV {csv_file_path}!')
                     collection = []
@@ -120,8 +120,8 @@ def ChaturBot2 (target_url, username, password, update_every, csv_file_path):
                     except:
                         print('CSV UPDATED: NO LAST ENTRY')
                     pd.DataFrame(collection).to_csv(csv_file_path)
-                    driver.get(target_url)
                     time.sleep(update_every)
+                    x += update_every
                     driver.find_element_by_class_name('chat-box')
                 except:
                     print(f'SESSION HAS ENDED {datetime.datetime.now()}')
@@ -129,4 +129,4 @@ def ChaturBot2 (target_url, username, password, update_every, csv_file_path):
         except:
             print(f'UNABLE TO LOCATE CHAT-BOX {datetime.datetime.now()}')
 
-ChaturBot2(target_url, username, password, update_every, csv_file_path)
+ChaturBot2(target_url, username, password, update_every, time_to_check, csv_file_path)
