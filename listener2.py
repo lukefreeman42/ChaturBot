@@ -40,6 +40,8 @@ def startup(target_url, username, password):
         options = Options()
         options.headless = True
         driver = webdriver.Firefox(options = options)
+        ## Wait 60 seconds before timeouts
+        driver.implicitly_wait(60)
         ### Go to target url
         driver.get(target_url)
         print(f'FOUND {target_url}')
@@ -49,21 +51,26 @@ def startup(target_url, username, password):
         accept_18 = wait.until(EC.element_to_be_clickable((By.ID, 'close_entrance_terms')))
         accept_18.click()
         print(f'ACCEPTED 18YR OLD CHECK')
+        print(f'...WAITING FOR LOGIN PAGE...')
         ## Redirect to Login Page
         login_page = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'login-link')))
         login_page.click()
-        print('GOING TO LOGIN PAGE')
+        print(f'GOING TO LOGIN PAGE')
+        print(f'...WAITING FOR INPUTING USERNAME...')
         ## Input username
         login_input = wait.until(EC.visibility_of_element_located((By.ID, 'id_username')))
         login_input.send_keys(username)
         ## Input password
+        print(f'...WAITING FOR INPUTING PASSWORD...')
         password_input = wait.until(EC.visibility_of_element_located((By.ID, 'id_password')))
         password_input.send_keys(password)
         ## Submit form
+        print(f'...WAITING TO SUBMIT CREDENTIALS...')
         login_input.submit()
         print('SUBMITTED LOGIN CREDENTIALS')
         ## Return the enviornment
         time.sleep(20)
+        print('FINISHED STARTUP')
         return (driver)
     except:
         print('STARTUP FAILED')
@@ -94,12 +101,11 @@ def scrape_chatbox(data, scrapeMe, session):
 def ChaturBot2 (target_url, username, password, update_every, time_to_check, csv_file_path):
     driver = startup(target_url, username, password)
     while (True):
+        print(f'OPENING ROOM...')
         try : #attempts to find chat-box
             driver.get(target_url)
-            time.sleep(20)
             driver.find_element_by_class_name('chat-box')
             print('LOCATED CHAT-BOX')
-            time.sleep(5)
             session = datetime.datetime.now()
             print(f'CREATING SESSION {session}')
             x = 0
@@ -111,7 +117,6 @@ def ChaturBot2 (target_url, username, password, update_every, time_to_check, csv
                 except:
                     print(f'CSV NOT FOUND: CREATING NEW CSV {csv_file_path}!')
                     collection = []
-                time.sleep(5)
                 try:
                     scrapeMe = driver.find_element_by_class_name('chat-box').text
                     scrape_chatbox(collection, scrapeMe, session)
