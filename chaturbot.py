@@ -12,9 +12,10 @@ from selenium.webdriver.firefox.options import Options
 import pandas as pd
 import time, re, json, sys, datetime
 from configparser import ConfigParser
+from aux.read_chat import chatbox_to_txt
 
 ###### ARGUMENTS ######
-requirements_path = './req'
+requirements_path = './req/'
 
 client = sys.argv[1] if len(sys.argv) > 1 else 'TEST'
 
@@ -70,6 +71,7 @@ def startup(target_url, username, password, wait_time):
         login_input.submit()
         print('SUBMITTED LOGIN CREDENTIALS')
         ## Return the enviornment
+        print('QUIT NOW OR REQUIRED TO KILL')
         time.sleep(wait_time)
         print('FINISHED STARTUP')
         return (driver)
@@ -122,6 +124,9 @@ def ChaturBot2 (target_url, username, password, update_every, time_to_check, csv
                     collection = []
                 try:
                     scrapeMe = driver.find_element_by_class_name('chat-box').text
+                    #START - AUXILARY FOR MILAN
+                    chatbox_to_txt(scrapeMe, 'forMilan.txt')
+                    #END
                     scrape_chatbox(collection, scrapeMe, session)
                     try:
                         print(f"CSV UPDATED: {collection[-1]['date']}")
