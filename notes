@@ -1,0 +1,8 @@
+nohup : Ignores HangUP signal, must be used when ssh to server, pipes stdout to nohup.log
+
+python3 -u : -u flushes out stdout, required to allow loggin while program is still runninig
+
+csvs/ : will need to create dir for each client
+
+wget "geckourl" : use this script to grab newest geckodriver for OS in use.
+
