@@ -4,7 +4,27 @@ import pandas as pd
 import time, re, json, sys, datetime, os
 from configparser import ConfigParser
 
-###### FUNCTIONS #######
+###### SIDE COURSE #######
+
+def progress(current, end):
+    tot_len = 30
+    percentage = current / float(end)
+
+    filled_len = int(round(tot_len * percentage))
+    percentage = round(100 * percentage, 1)
+
+    bar = '=' * filled_len + '-' * (tot_len - filled_len)
+
+    sys.stdout.write(f'[{bar}] {percentage}%\r')
+    sys.stdout.flush()
+
+def loading(sleep_time):
+    for t in range(sleep_time + 1):
+        progress(t, sleep_time)
+        time.sleep(1)
+
+
+###### THE MEAT #######
 
 def startup(requirements_path, target_url, login, settings):
     try:
@@ -50,7 +70,7 @@ def startup(requirements_path, target_url, login, settings):
         ## Return the enviornment
         print('FINISHED STARTUP')
         print('\nQUIT NOW OR REQUIRED TO KILL')
-        time.sleep(timeout)
+        loading(timeout)
         print(f'\nOPENING ROOM...\n{target_url}')
         return (driver)
     except Exception as e:
@@ -58,7 +78,7 @@ def startup(requirements_path, target_url, login, settings):
         driver.quit()
         sys.exit()
 
-def create_sessionKey(driver):
+def create_sessionKey(driver, target_url):
     try:
         driver.get(target_url)
         print('LOCATING CHAT-BOX...')
@@ -71,7 +91,7 @@ def create_sessionKey(driver):
         print(f'\nUNABLE TO LOCATE CHAT-BOX {datetime.datetime.now()}\nEXCEPTION:\n{e}')
         return False
 
-def tips_to_csv(first, csv_update, driver, csv_file_path, session):
+def tips_to_csv(first, csv_update, driver, csv_file_path, session, target_url):
     try:
         try:
             collection = list(pd.read_csv(csv_file_path).drop('Unnamed: 0', axis=1).to_dict(orient='index').values())
@@ -83,7 +103,9 @@ def tips_to_csv(first, csv_update, driver, csv_file_path, session):
         scrapeMe = driver.find_element_by_class_name('chat-box').text
         scrape_chatbox(collection, scrapeMe, session)
         pd.DataFrame(collection).to_csv(csv_file_path)
-        time.sleep(csv_update)
+        print(f'TIME UNTIL NEXT UPDATE: {csv_update}s')
+        driver.get(target_url)
+        loading(csv_update)
         return True
     except Exception as e:
         print(f"TIPS TO CSV FAILED!!!\nENDING SESSION!!!\nEXCEPTION:{e}")
@@ -110,7 +132,7 @@ def scrape_chatbox(data, scrapeMe, session):
                 data.append(Json)  
         except Exception as e:
             print(f"\nERROR IN SCRAPE CHATBOX FUNC... \n{e}")
-    print(f"APPENDED {len(data) - x} ENTRIES")
+    print(f"\nAPPENDED {len(data) - x} ENTRIES")
     try:
         print(f"CSV LAST-ENTRY: {data[-1]['date']}")
     except:
@@ -120,18 +142,23 @@ def ChaturBot_csv (requirements_path, target_url, login, settings, csv_file_path
     csv_update = settings['csv_update']
 
     driver = startup(requirements_path, target_url, login, settings)
-    while (True):
-            sessionKey = create_sessionKey(driver)
-            if sessionKey:
-                # begin tips_to_csv function
-                print(f'BEGINNING {tips_to_csv}')
-                for first in range(0, settings.time_till_restart, csv_update):
-                    if not tips_to_csv(first, csv_update, driver, csv_file_path, sessionKey):
-                        break
-                print(f'\nCHECKING IF MODEL IS ONLINE...')
-            else:
-                print(f'FAILED...\nCHECKING IF MODEL ONLINE IN {csv_update}s')
-                time.sleep(csv_update)
+    try:
+        while (True):
+                sessionKey = create_sessionKey(driver, target_url)
+                if sessionKey:
+                    # begin tips_to_csv function
+                    print(f'BEGINNING {tips_to_csv}')
+                    for first in range(0, settings['time_till_restart'], csv_update):
+                        if not tips_to_csv(first, csv_update, driver, csv_file_path, sessionKey, target_url):
+                            break
+                    print(f'\nCHECKING IF MODEL IS ONLINE...')
+                else:
+                    print(f'FAILED...\nCHECKING IF MODEL ONLINE...')
+                    loading(csv_update)
+    except Exception as e:
+        print(f"EXCEPTION: {e}")
+        driver.quit()
+        sys.exit()
 
 def main():
     #path to required files
@@ -140,7 +167,7 @@ def main():
     
     #grab client
     client = sys.argv[1] if len(sys.argv) > 1 else 'TEST_CB'
-    print(f'CLIENT IS "{client}"')
+    print(f'\n\nCLIENT IS "{client}"')
     #read config file
     try:
         config = ConfigParser()
